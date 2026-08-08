@@ -1,0 +1,24 @@
+dart_code_metrics:
+  exclude-public-api: false
+  extends:
+    - package:dart_code_metrics_presets/recommended.yaml
+    - package:dart_code_metrics_presets/metrics_recommended.yaml
+    - package:dart_code_metrics_presets/intl.yaml
+    - package:dart_code_metrics_presets/bloc.yaml
+  rules:
+    - prefer-declaring-const-constructor: true
+    - prefer-single-widget-per-file: false
+    - prefer-match-file-name:
+        exclude:
+          - test/**
+    - avoid-cubits: false
+    - avoid-nullable-interpolation:
+        ignored-invocations:
+          - log
+          - debugPrint
+          - print
+    - prefer-number-format: false
+    - avoid-empty-build-when: false
+
+formatter:
+  page_width: 100
