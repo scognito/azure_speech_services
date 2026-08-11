@@ -78,6 +78,8 @@ class _TtsScreenState extends State<TtsScreen> {
       final audioBytes = await widget.ttsService.synthesize(
         TtsRequest(text: _textToSpeak, voice: _selectedTtsVoice!),
       );
+
+      await _audioPlayer.stop();
       await _audioPlayer.setAudioSource(MyCustomSource(audioBytes));
       await _audioPlayer.play();
     } catch (e) {

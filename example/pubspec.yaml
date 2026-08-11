@@ -15,8 +15,8 @@ dependencies:
     path: ../
   
   provider: ^6.1.5+1
-  flutter_dotenv: ^6.0.0
-  just_audio: ^0.9.39
+  flutter_dotenv: ^6.0.1
+  just_audio: ^0.10.6
 
 dev_dependencies:
   flutter_test:
