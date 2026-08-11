@@ -14,7 +14,7 @@ dependencies:
   uuid: ^4.6.0
   http: ^1.6.0
   web_socket_channel: ^3.0.3
-  record: ^6.2.0 # do not upgrade to 7.x as it will not work on web
+  record: ^7.1.1
   flutter_bloc: ^9.1.1
   equatable: ^2.1.0
 
