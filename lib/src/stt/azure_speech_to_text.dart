@@ -60,6 +60,7 @@ class AzureSpeechToText {
   }
 
   Future<void> dispose() async {
+    await _service.stopListening();
     await _microphone.dispose();
     await _cubit.close();
   }

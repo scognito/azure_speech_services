@@ -1,3 +1,8 @@
+# 1.0.4
+
+- Fix `PlatformException` on dispose when the recorder was never started (e.g. when an external audio stream is supplied and the native recorder is never created)
+- Fix `Bad state: Cannot emit new states after calling close` by stopping the STT session (closing the WebSocket and cancelling its subscription) before closing the transcription cubit on dispose, and by making `TranscriptionCubit` ignore emits that race past `close()` (websocket messages, the clear-text timer, or the explicit stop-listening call)
+
 # 1.0.3
 
 - Fix Text to speech sample

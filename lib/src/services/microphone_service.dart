@@ -8,6 +8,7 @@ import 'package:record/record.dart';
 class MicrophoneService {
   final AudioRecorder _audioRecorder = AudioRecorder();
   bool _isRecording = false;
+  bool _hasStarted = false;
 
   Future<Stream<Uint8List>> start() async {
     if (!await _checkPermission()) {
@@ -35,6 +36,7 @@ class MicrophoneService {
 
     final stream = await _audioRecorder.startStream(config);
     _isRecording = true;
+    _hasStarted = true;
 
     if (actualSampleRate == null || actualSampleRate == Constants.audioSampleRate) {
       return stream;
@@ -63,7 +65,7 @@ class MicrophoneService {
 
   Future<void> dispose() async {
     if (_isRecording) await stop();
-    await _audioRecorder.dispose();
+    if (_hasStarted) await _audioRecorder.dispose();
   }
 }
 

@@ -7,6 +7,14 @@ part 'transcription_state.dart';
 class TranscriptionCubit extends Cubit<TranscriptionState> {
   TranscriptionCubit() : super(const TranscriptionState());
 
+  /// Teardown of the STT session (websocket messages, the clear-text timer,
+  /// and the explicit stop-listening call) races with [close]; silently
+  /// dropping a late emit is safer than crashing the call-teardown path.
+  @override
+  void emit(TranscriptionState state) {
+    if (!isClosed) super.emit(state);
+  }
+
   void setListening(bool listening) {
     emit(state.copyWith(isListening: listening));
   }
