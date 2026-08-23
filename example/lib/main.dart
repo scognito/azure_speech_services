@@ -1,7 +1,5 @@
 // ignore_for_file: experimental_member_use
 
-import 'dart:typed_data';
-
 import 'package:azure_speech_services/azure_speech_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,7 +36,8 @@ class AzureSpeechToTextExample extends StatefulWidget {
   const AzureSpeechToTextExample({super.key});
 
   @override
-  State<AzureSpeechToTextExample> createState() => _AzureSpeechToTextExampleState();
+  State<AzureSpeechToTextExample> createState() =>
+      _AzureSpeechToTextExampleState();
 }
 
 class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
@@ -59,6 +58,12 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
   @override
   void initState() {
     super.initState();
+    _ttsService = AzureTextToSpeech(
+      config: AzureSpeechConfig.subscriptionKey(
+        region: _region,
+        key: _subscriptionKey,
+      ),
+    );
     _initAzureServices();
   }
 
@@ -84,15 +89,19 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
       languageIdMode = LanguageIdMode.continuous;
     }
 
-    final config = AzureSpeechConfig.subscriptionKey(region: _region, key: _subscriptionKey);
+    final config = AzureSpeechConfig.subscriptionKey(
+      region: _region,
+      key: _subscriptionKey,
+    );
 
     _sttService = AzureSpeechToText(
       debug: true,
       config: config,
-      sttConfig: SpeechToTextConfig(languages: languages, languageIdMode: languageIdMode),
+      sttConfig: SpeechToTextConfig(
+        languages: languages,
+        languageIdMode: languageIdMode,
+      ),
     );
-
-    _ttsService = AzureTextToSpeech(config: config);
 
     _translationService = AzureSpeechTranslation(
       debug: true,
@@ -141,6 +150,7 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
   void dispose() {
     _sttService.dispose();
     _translationService.dispose();
+    _ttsService.dispose();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -175,7 +185,10 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.mic), label: 'STT'),
           BottomNavigationBarItem(icon: Icon(Icons.volume_up), label: 'TTS'),
-          BottomNavigationBarItem(icon: Icon(Icons.translate), label: 'Translate'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.translate),
+            label: 'Translate',
+          ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.white,
@@ -183,25 +196,6 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
         onTap: _onItemTapped,
         backgroundColor: const Color(0xFF2E3192),
       ),
-    );
-  }
-}
-
-class MyCustomSource extends StreamAudioSource {
-  final List<int> _audioBytes;
-
-  MyCustomSource(this._audioBytes) : super(tag: 'MyCustomSource');
-
-  @override
-  Future<StreamAudioResponse> request([int? start, int? end]) async {
-    start ??= 0;
-    end ??= _audioBytes.length;
-    return StreamAudioResponse(
-      sourceLength: _audioBytes.length,
-      contentLength: end - start,
-      offset: start,
-      contentType: 'audio/mpeg',
-      stream: Stream.value(Uint8List.fromList(_audioBytes.sublist(start, end))),
     );
   }
 }

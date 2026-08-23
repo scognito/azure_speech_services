@@ -8,15 +8,21 @@ import 'package:http/http.dart' as http;
 
 class AzureTextToSpeech {
   final AzureSpeechConfig config;
+  final http.Client _client;
 
-  const AzureTextToSpeech({required this.config});
+  /// [client] can be supplied for testing; a single [http.Client] is otherwise
+  /// created and reused for the lifetime of this instance so that repeated
+  /// requests to Azure reuse the same TCP/TLS connection instead of paying a
+  /// fresh handshake on every call. Call [dispose] when done with it.
+  AzureTextToSpeech({required this.config, http.Client? client})
+    : _client = client ?? http.Client();
 
   Future<List<TtsVoice>> listVoices() async {
     final url = Uri.parse(
       'https://${config.region}.tts.speech.microsoft.com/cognitiveservices/voices/list',
     );
 
-    final response = await http.get(url, headers: buildAuthHeaders(config));
+    final response = await _client.get(url, headers: buildAuthHeaders(config));
 
     if (response.statusCode != 200) {
       throw AzureTtsException(response);
@@ -30,7 +36,7 @@ class AzureTextToSpeech {
   Future<List<int>> synthesize(TtsRequest request) async {
     final url = Uri.parse('https://${config.region}.tts.speech.microsoft.com/cognitiveservices/v1');
 
-    final response = await http.post(
+    final response = await _client.post(
       url,
       headers: {
         ...buildAuthHeaders(config),
@@ -45,5 +51,9 @@ class AzureTextToSpeech {
     }
 
     return response.bodyBytes;
+  }
+
+  void dispose() {
+    _client.close();
   }
 }

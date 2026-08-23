@@ -1,6 +1,6 @@
 name: azure_speech_services
 description: "A Flutter package for real-time Speech-to-Text, Text-To-Speech transcription, and Translation  using Microsoft Azure Cognitive Services. Supports Mobile, Desktop, and Web platforms"
-version: 1.0.4
+version: 1.0.5
 homepage: https://github.com/scognito/azure_speech_services
 repository: https://github.com/scognito/azure_speech_services
 issue_tracker: https://github.com/scognito/azure_speech_services/issues

@@ -1,3 +1,7 @@
+# 1.0.5
+
+- Reduce Text-to-Speech latency by reusing a single `http.Client` in `AzureTextToSpeech` instead of opening a fresh connection (TCP+TLS handshake) on every `synthesize()`/`listVoices()` call; add `AzureTextToSpeech.dispose()` to close it
+
 # 1.0.4
 
 - Fix `PlatformException` on dispose when the recorder was never started (e.g. when an external audio stream is supplied and the native recorder is never created)

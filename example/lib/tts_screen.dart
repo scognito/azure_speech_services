@@ -1,5 +1,6 @@
 // ignore_for_file: experimental_member_use
 
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:azure_speech_services/azure_speech_services.dart';
@@ -70,6 +71,8 @@ class _TtsScreenState extends State<TtsScreen> {
       return;
     }
 
+    final stopwatch = Stopwatch()..start();
+
     setState(() {
       _isSynthesizing = true;
     });
@@ -81,6 +84,18 @@ class _TtsScreenState extends State<TtsScreen> {
 
       await _audioPlayer.stop();
       await _audioPlayer.setAudioSource(MyCustomSource(audioBytes));
+
+      unawaited(
+        _audioPlayer.playerStateStream.firstWhere((state) => state.playing).then((
+          _,
+        ) {
+          stopwatch.stop();
+          debugPrint(
+            'Button press to audio playback start: ${stopwatch.elapsedMilliseconds}ms',
+          );
+        }),
+      );
+
       await _audioPlayer.play();
     } catch (e) {
       debugPrint('Error synthesizing speech: $e');
@@ -235,8 +250,9 @@ class MyCustomSource extends StreamAudioSource {
       sourceLength: _audioBytes.length,
       contentLength: end - start,
       offset: start,
+      // Matches TtsRequest's default outputFormat (audio16khz128kbitrateMonoMp3); update
+      // if the example ever lets the user pick a different AudioOutputFormat.
       contentType: 'audio/mpeg',
-      // Assuming MP3 format
       stream: Stream.value(Uint8List.fromList(_audioBytes.sublist(start, end))),
     );
   }

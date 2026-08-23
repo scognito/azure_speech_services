@@ -91,9 +91,9 @@ class _LinearResampler {
     // stays continuous across the boundary; for the very first chunk there is
     // no previous sample, so it's seeded with this chunk's own first sample.
     final extended = Int16List(sampleCount + 1);
-    extended[0] = _hasPreviousSample ? _lastSample : inputView.getInt16(0, Endian.little);
+    extended[0] = _hasPreviousSample ? _lastSample : inputView.getInt16(0, .little);
     for (var i = 0; i < sampleCount; i++) {
-      extended[i + 1] = inputView.getInt16(i * 2, Endian.little);
+      extended[i + 1] = inputView.getInt16(i * 2, .little);
     }
 
     final ratio = fromRate / toRate;
@@ -113,7 +113,7 @@ class _LinearResampler {
     final output = Uint8List(outputSamples.length * 2);
     final outputView = ByteData.view(output.buffer);
     for (var i = 0; i < outputSamples.length; i++) {
-      outputView.setInt16(i * 2, outputSamples[i], Endian.little);
+      outputView.setInt16(i * 2, outputSamples[i], .little);
     }
     return output;
   }
