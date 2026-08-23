@@ -66,6 +66,20 @@ class _TtsScreenState extends State<TtsScreen> {
     }
   }
 
+  Future<void> _showVoicePicker() async {
+    final selected = await showModalBottomSheet<TtsVoice>(
+      context: context,
+      backgroundColor: const Color(0xFF2E3192),
+      isScrollControlled: true,
+      builder: (context) => _VoiceSearchSheet(voices: _availableTtsVoices),
+    );
+    if (selected != null) {
+      setState(() {
+        _selectedTtsVoice = selected;
+      });
+    }
+  }
+
   Future<void> _synthesizeAndPlay() async {
     if (_selectedTtsVoice == null || _textToSpeak.isEmpty) {
       return;
@@ -156,56 +170,56 @@ class _TtsScreenState extends State<TtsScreen> {
                       const SizedBox(height: 10),
                       _isLoadingVoices
                           ? const CircularProgressIndicator()
-                          : Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withAlpha(51),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: DropdownButtonHideUnderline(
-                                child: DropdownButton<TtsVoice>(
-                                  value: _selectedTtsVoice,
-                                  dropdownColor: const Color(0xFF2E3192),
-                                  icon: const Icon(
-                                    Icons.arrow_drop_down,
-                                    color: Colors.white,
-                                  ),
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                  ),
-                                  onChanged: (TtsVoice? newValue) {
-                                    setState(() {
-                                      _selectedTtsVoice = newValue;
-                                    });
-                                  },
-                                  items: _availableTtsVoices.map((voice) {
-                                    return DropdownMenuItem<TtsVoice>(
-                                      value: voice,
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 2.0,
-                                          horizontal: 4.0,
-                                        ),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
+                          : InkWell(
+                              onTap: _availableTtsVoices.isEmpty
+                                  ? null
+                                  : _showVoicePicker,
+                              borderRadius: BorderRadius.circular(30),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withAlpha(51),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Flexible(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _selectedTtsVoice == null
+                                                ? 'Select a voice'
+                                                : '${_selectedTtsVoice!.localName} (${_selectedTtsVoice!.gender})',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          if (_selectedTtsVoice != null)
                                             Text(
-                                              '${voice.localName} (${voice.gender})',
+                                              '[${_selectedTtsVoice!.locale}]',
                                               style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                fontSize: 12,
                                               ),
                                             ),
-                                            Text('[${voice.locale}]'),
-                                          ],
-                                        ),
+                                        ],
                                       ),
-                                    );
-                                  }).toList(),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(
+                                      Icons.arrow_drop_down,
+                                      color: Colors.white,
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -232,6 +246,121 @@ class _TtsScreenState extends State<TtsScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Bottom sheet listing [TtsVoice]s, filterable by name or locale.
+class _VoiceSearchSheet extends StatefulWidget {
+  final List<TtsVoice> voices;
+
+  const _VoiceSearchSheet({required this.voices});
+
+  @override
+  State<_VoiceSearchSheet> createState() => _VoiceSearchSheetState();
+}
+
+class _VoiceSearchSheetState extends State<_VoiceSearchSheet> {
+  late final TextEditingController _searchController;
+  late List<TtsVoice> _filteredVoices;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _filteredVoices = widget.voices;
+  }
+
+  void _onSearchChanged(String query) {
+    final lowerQuery = query.toLowerCase();
+    setState(() {
+      _filteredVoices = widget.voices
+          .where(
+            (voice) =>
+                voice.localName.toLowerCase().contains(lowerQuery) ||
+                voice.locale.toLowerCase().contains(lowerQuery),
+          )
+          .toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.9,
+      expand: false,
+      builder: (context, scrollController) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            children: [
+              TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                onChanged: _onSearchChanged,
+                decoration: InputDecoration(
+                  hintText: 'Search by name or locale',
+                  hintStyle: TextStyle(color: Colors.white.withAlpha(153)),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white.withAlpha(51)),
+                  ),
+                  focusedBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Expanded(
+                child: _filteredVoices.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'No voices found',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      )
+                    : ListView.builder(
+                        controller: scrollController,
+                        itemCount: _filteredVoices.length,
+                        itemBuilder: (context, index) {
+                          final voice = _filteredVoices[index];
+                          return ListTile(
+                            title: Text(
+                              '${voice.localName} (${voice.gender})',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              '[${voice.locale}]',
+                              style: TextStyle(
+                                color: Colors.white.withAlpha(204),
+                              ),
+                            ),
+                            onTap: () => Navigator.of(context).pop(voice),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
