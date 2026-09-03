@@ -17,4 +17,5 @@ export 'package:azure_speech_services/src/translation/translation_config.dart';
 export 'package:azure_speech_services/src/translation/translation_cubit.dart'
     show TranslationCubit, TranslationState;
 export 'package:azure_speech_services/src/tts/azure_text_to_speech.dart';
+export 'package:azure_speech_services/src/tts/azure_tts_websocket_service.dart';
 export 'package:azure_speech_services/src/utils/language_utils.dart' show LanguageUtils;

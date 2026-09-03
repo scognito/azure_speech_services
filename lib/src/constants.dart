@@ -16,6 +16,7 @@ class Constants {
   static const String format = 'Format';
   static const String userAgent = 'User-Agent';
   static const String requestId = 'X-RequestId';
+  static const String requestStreamId = 'X-StreamId';
   static const String requestTimestamp = 'X-Timestamp';
   static const String outputFormat = 'X-Microsoft-OutputFormat';
   static const String lidEnabled = 'lidEnabled';

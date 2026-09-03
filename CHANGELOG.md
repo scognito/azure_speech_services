@@ -1,3 +1,7 @@
+# 1.0.6
+
+- Add `AzureTtsWebSocketService`, a WebSocket-based alternative to `AzureTextToSpeech` that streams synthesized audio in chunks as it is generated, instead of waiting for the full clip like the REST endpoint — lets a caller start playback on the first chunk rather than the whole response
+
 # 1.0.5
 
 - Reduce Text-to-Speech latency by reusing a single `http.Client` in `AzureTextToSpeech` instead of opening a fresh connection (TCP+TLS handshake) on every `synthesize()`/`listVoices()` call; add `AzureTextToSpeech.dispose()` to close it

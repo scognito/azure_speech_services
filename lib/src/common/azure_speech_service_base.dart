@@ -21,7 +21,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 abstract class AzureSpeechServiceBase {
   final AzureSpeechConfig config;
   final bool debug;
-  final MicrophoneService micService;
+  final MicrophoneService? micService;
 
   final String crlf = '\r\n';
   final _uuid = Uuid();
@@ -30,7 +30,7 @@ abstract class AzureSpeechServiceBase {
   StreamSubscription? _socketSubscription;
   StreamSubscription<Uint8List>? _micSubscription;
 
-  AzureSpeechServiceBase({required this.config, required this.micService, this.debug = false});
+  AzureSpeechServiceBase({required this.config, this.micService, this.debug = false});
 
   Future<String> _getAuthToken() async {
     final subscriptionKey = config.subscriptionKey!;
@@ -111,7 +111,9 @@ abstract class AzureSpeechServiceBase {
   }) async {
     sendWavHeader(requestId);
 
-    final audioStream = externalAudioStream ?? await micService.start();
+    // Only callers that stream audio (STT/Translation) reach this method, and they always
+    // supply a real microphone service.
+    final audioStream = externalAudioStream ?? await micService!.start();
 
     _micSubscription = audioStream.listen(
       (Uint8List audioChunk) {
@@ -134,7 +136,7 @@ abstract class AzureSpeechServiceBase {
 
   Future<void> stopSession() async {
     try {
-      await micService.stop();
+      await micService?.stop();
       await _micSubscription?.cancel();
       _micSubscription = null;
       await _channel?.sink.close();
@@ -180,6 +182,14 @@ abstract class AzureSpeechServiceBase {
     _sendSpeechMessage(msg, _channel!);
   }
 
+  /// Like [sendTextFrame], but sends [body] verbatim instead of JSON-encoding a payload map —
+  /// needed for frames such as `ssml` whose body is `application/ssml+xml`, not JSON.
+  void sendRawTextFrame(String path, String requestId, String contentType, String body) {
+    if (_channel == null) return;
+    final msg = SpeechConnectionMessage(.text, path, requestId, contentType, TextMessageBody(body));
+    _sendSpeechMessage(msg, _channel!);
+  }
+
   void sendSpeechConfig(String requestId) {
     sendTextFrame('speech.config', requestId, {
       'context': {
@@ -217,6 +227,27 @@ abstract class AzureSpeechServiceBase {
       return ParsedFrame(headers: headers, body: parts.sublist(1).join('\n\n'));
     }
     return ParsedFrame(headers: {}, body: raw);
+  }
+
+  /// Parses a binary frame received from the service — the mirror of
+  /// [_serializeBinaryConnectionMessage]: a 2-byte big-endian header length, that many bytes of
+  /// UTF-8 `key:value` headers (each terminated by [crlf]), then the raw payload.
+  ParsedBinaryFrame parseBinaryFrame(Uint8List raw) {
+    if (raw.length < 2) return ParsedBinaryFrame(headers: {}, body: raw);
+
+    final headerLength = ByteData.sublistView(raw, 0, 2).getUint16(0, .big);
+    final headerBytes = raw.sublist(2, 2 + headerLength);
+
+    final headers = <String, String>{};
+    for (final line in utf8.decode(headerBytes).split(crlf)) {
+      if (line.isEmpty) continue;
+      final idx = line.indexOf(':');
+      if (idx > 0) {
+        headers[line.substring(0, idx).trim()] = line.substring(idx + 1).trim();
+      }
+    }
+
+    return ParsedBinaryFrame(headers: headers, body: raw.sublist(2 + headerLength));
   }
 
   void _sendSpeechMessage(SpeechConnectionMessage message, WebSocketChannel channel) {
@@ -291,6 +322,13 @@ abstract class AzureSpeechServiceBase {
   }
 
   bool get isSessionActive => _channel != null;
+}
+
+class ParsedBinaryFrame {
+  final Map<String, String> headers;
+  final Uint8List body;
+
+  const ParsedBinaryFrame({required this.headers, required this.body});
 }
 
 class ParsedFrame {

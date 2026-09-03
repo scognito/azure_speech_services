@@ -4,6 +4,7 @@ import 'package:azure_speech_services/azure_speech_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_soloud/flutter_soloud.dart';
 import 'package:just_audio/just_audio.dart';
 
 import 'stt_screen.dart';
@@ -12,6 +13,7 @@ import 'tts_screen.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.env');
+  await SoLoud.instance.init();
   runApp(const MyApp());
 }
 
@@ -43,6 +45,7 @@ class AzureSpeechToTextExample extends StatefulWidget {
 class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
   late AzureSpeechToText _sttService;
   late AzureTextToSpeech _ttsService;
+  late AzureTtsWebSocketService _ttsWebSocketService;
   late AzureSpeechTranslation _translationService;
   final AudioPlayer _audioPlayer = AudioPlayer();
 
@@ -59,6 +62,13 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
   void initState() {
     super.initState();
     _ttsService = AzureTextToSpeech(
+      config: AzureSpeechConfig.subscriptionKey(
+        region: _region,
+        key: _subscriptionKey,
+      ),
+    );
+    _ttsWebSocketService = AzureTtsWebSocketService(
+      debug: true,
       config: AzureSpeechConfig.subscriptionKey(
         region: _region,
         key: _subscriptionKey,
@@ -166,7 +176,11 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
           onLanguageChanged: _onLanguageChanged,
         ),
       ),
-      TtsScreen(ttsService: _ttsService, audioPlayer: _audioPlayer),
+      TtsScreen(
+        ttsService: _ttsService,
+        ttsWebSocketService: _ttsWebSocketService,
+        audioPlayer: _audioPlayer,
+      ),
       BlocProvider.value(
         value: _translationService.cubit,
         child: TranslationScreen(

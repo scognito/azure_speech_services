@@ -17,6 +17,7 @@ dependencies:
   provider: ^6.1.5+1
   flutter_dotenv: ^6.0.1
   just_audio: ^0.10.6
+  flutter_soloud: ^4.1.7
 
 dev_dependencies:
   flutter_test:

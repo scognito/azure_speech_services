@@ -41,6 +41,9 @@ enum AudioOutputFormat {
   /// Riff 8khz 8bit mono pcm
   riff8khz8bitMonoPcm('riff-8khz-8bit-mono-pcm'),
 
+  /// Riff 8khz 16bit mono pcm
+  riff8khz16bitMonoPcm('riff-8khz-16bit-mono-pcm'),
+
   /// Riff 16khz 16bit mono pcm
   riff16khz16bitMonoPcm('riff-16khz-16bit-mono-pcm'),
 
