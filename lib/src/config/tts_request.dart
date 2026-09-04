@@ -32,8 +32,26 @@ enum AudioOutputFormat {
   /// Raw 8khz 8bit mono pcm
   raw8khz8bitMonoPcm('raw-8khz-8bit-mono-pcm'),
 
+  /// Raw 8khz 8bit mono alaw
+  raw8khz8bitMonoAlaw('raw-8khz-8bit-mono-alaw'),
+
+  /// Raw 8khz 16bit mono pcm
+  raw8khz16bitMonoPcm('raw-8khz-16bit-mono-pcm'),
+
   /// Raw 16khz 16bit mono pcm
   raw16khz16bitMonoPcm('raw-16khz-16bit-mono-pcm'),
+
+  /// Raw 22050hz 16bit mono pcm
+  raw22050hz16bitMonoPcm('raw-22050hz-16bit-mono-pcm'),
+
+  /// Raw 24khz 16bit mono pcm
+  raw24khz16bitMonoPcm('raw-24khz-16bit-mono-pcm'),
+
+  /// Raw 44100hz 16bit mono pcm
+  raw44100hz16bitMonoPcm('raw-44100hz-16bit-mono-pcm'),
+
+  /// Raw 48khz 16bit mono pcm
+  raw48khz16bitMonoPcm('raw-48khz-16bit-mono-pcm'),
 
   /// Riff 8khz 8bit mono mulaw
   riff8khz8bitMonoMulaw('riff-8khz-8bit-mono-mulaw'),
@@ -41,8 +59,26 @@ enum AudioOutputFormat {
   /// Riff 8khz 8bit mono pcm
   riff8khz8bitMonoPcm('riff-8khz-8bit-mono-pcm'),
 
+  /// Riff 8khz 8bit mono alaw
+  riff8khz8bitMonoAlaw('riff-8khz-8bit-mono-alaw'),
+
+  /// Riff 8khz 16bit mono pcm
+  riff8khz16bitMonoPcm('riff-8khz-16bit-mono-pcm'),
+
   /// Riff 16khz 16bit mono pcm
   riff16khz16bitMonoPcm('riff-16khz-16bit-mono-pcm'),
+
+  /// Riff 22050hz 16bit mono pcm
+  riff22050hz16bitMonoPcm('riff-22050hz-16bit-mono-pcm'),
+
+  /// Riff 24khz 16bit mono pcm
+  riff24khz16bitMonoPcm('riff-24khz-16bit-mono-pcm'),
+
+  /// Riff 44100hz 16bit mono pcm
+  riff44100hz16bitMonoPcm('riff-44100hz-16bit-mono-pcm'),
+
+  /// Riff 48khz 16bit mono pcm
+  riff48khz16bitMonoPcm('riff-48khz-16bit-mono-pcm'),
 
   /// Audio 16khz 128kbitrate mono mp3
   audio16khz128kbitrateMonoMp3('audio-16khz-128kbitrate-mono-mp3'),
@@ -86,8 +122,17 @@ enum AudioOutputFormat {
   /// Webm 24khz 16bit mono opus
   webm24khz16bitMonOpus('webm-24khz-16bit-mono-opus'),
 
-  /// Webm 48khz 16bit mono opus
-  webm48khz16bitMonOpus('webm-48khz-16bit-mono-opus');
+  /// Webm 24khz 16bit 24kbps mono opus (IoT-optimized bitrate)
+  webm24khz16bit24kbpsMonoOpus('webm-24khz-16bit-24kbps-mono-opus'),
+
+  /// Audio 16khz 16bit 32kbps mono opus (no container)
+  audio16khz16bit32kbpsMonoOpus('audio-16khz-16bit-32kbps-mono-opus'),
+
+  /// Audio 24khz 16bit 48kbps mono opus (no container)
+  audio24khz16bit48kbpsMonoOpus('audio-24khz-16bit-48kbps-mono-opus'),
+
+  /// Audio 24khz 16bit 24kbps mono opus (no container)
+  audio24khz16bit24kbpsMonoOpus('audio-24khz-16bit-24kbps-mono-opus');
 
   final String value;
 

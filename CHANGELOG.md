@@ -1,3 +1,8 @@
+# 1.0.6
+
+- Added additional audio formats
+- Improved example
+
 # 1.0.5
 
 - Reduce Text-to-Speech latency by reusing a single `http.Client` in `AzureTextToSpeech` instead of opening a fresh connection (TCP+TLS handshake) on every `synthesize()`/`listVoices()` call; add `AzureTextToSpeech.dispose()` to close it

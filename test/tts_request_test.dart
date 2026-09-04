@@ -11,10 +11,10 @@ void main() {
   );
 
   group('TtsRequest', () {
-    test('defaults to audio16khz128kbitrateMonoMp3', () {
+    test('defaults to riff8khz16bitMonoPcm', () {
       const request = TtsRequest(text: 'Hello', voice: voice);
 
-      expect(request.outputFormat, AudioOutputFormat.audio16khz128kbitrateMonoMp3);
+      expect(request.outputFormat, AudioOutputFormat.riff8khz16bitMonoPcm);
     });
 
     test('renders SSML with the voice locale, gender, name, and text', () {
