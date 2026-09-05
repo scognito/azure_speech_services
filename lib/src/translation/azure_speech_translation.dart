@@ -53,6 +53,7 @@ class AzureSpeechTranslation {
   Future<void> stop() => _service.stopListening();
 
   Future<void> dispose() async {
+    await _service.stopListening();
     await _microphone.dispose();
     await _cubit.close();
   }

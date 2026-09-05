@@ -1,3 +1,8 @@
+# 1.0.7
+
+- Fix `AzureSpeechTranslation.dispose()` leaking the WebSocket session 
+- Fix example app leaking the previous STT or Translation service when only the other one's language dropdown changed
+
 # 1.0.6
 
 - Added additional audio formats

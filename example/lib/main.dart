@@ -58,16 +58,15 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
   @override
   void initState() {
     super.initState();
-    _ttsService = AzureTextToSpeech(
-      config: AzureSpeechConfig.subscriptionKey(
-        region: _region,
-        key: _subscriptionKey,
-      ),
-    );
-    _initAzureServices();
+    _ttsService = AzureTextToSpeech(config: _azureConfig);
+    _initSttService();
+    _initTranslationService();
   }
 
-  void _initAzureServices() {
+  AzureSpeechConfig get _azureConfig =>
+      AzureSpeechConfig.subscriptionKey(region: _region, key: _subscriptionKey);
+
+  void _initSttService() {
     List<String> languages = [_currentLanguage];
     LanguageIdMode languageIdMode = LanguageIdMode.atStart;
 
@@ -89,23 +88,20 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
       languageIdMode = LanguageIdMode.continuous;
     }
 
-    final config = AzureSpeechConfig.subscriptionKey(
-      region: _region,
-      key: _subscriptionKey,
-    );
-
     _sttService = AzureSpeechToText(
       debug: true,
-      config: config,
+      config: _azureConfig,
       sttConfig: SpeechToTextConfig(
         languages: languages,
         languageIdMode: languageIdMode,
       ),
     );
+  }
 
+  void _initTranslationService() {
     _translationService = AzureSpeechTranslation(
       debug: true,
-      config: config,
+      config: _azureConfig,
       translationConfig: TranslationConfig(
         fromLanguage: _translationFromLanguage,
         toLanguages: [_translationToLanguage],
@@ -118,7 +114,7 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
     _sttService.dispose();
     setState(() {
       _currentLanguage = newLanguage;
-      _initAzureServices();
+      _initSttService();
     });
   }
 
@@ -127,7 +123,7 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
     _translationService.dispose();
     setState(() {
       _translationFromLanguage = newLanguage;
-      _initAzureServices();
+      _initTranslationService();
     });
   }
 
@@ -136,7 +132,7 @@ class _AzureSpeechToTextExampleState extends State<AzureSpeechToTextExample> {
     _translationService.dispose();
     setState(() {
       _translationToLanguage = newLanguage;
-      _initAzureServices();
+      _initTranslationService();
     });
   }
 
