@@ -1,3 +1,7 @@
+# 1.0.8
+
+- Updated libraries dependencies
+
 # 1.0.7
 
 - Fix `AzureSpeechTranslation.dispose()` leaking the WebSocket session 
